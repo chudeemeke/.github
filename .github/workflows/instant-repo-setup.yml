@@ -44,10 +44,10 @@ This project has Universal Claude CI/CD Fixer enabled for self-healing builds.
 EOF
 
           # Commit
-          git config user.email "claude-bot@anthropic.com"
-          git config user.name "Claude Instant Bot"
+          git config user.email "chude@emeke.org"
+          git config user.name "Chude"
           git add -A
-          git commit -m "⚡ Instant setup: Universal Claude CI/CD Fixer
+          git commit -m "Instant setup: Universal CI/CD Fixer
 
           - Added immediately upon repository creation
           - Self-healing CI/CD enabled

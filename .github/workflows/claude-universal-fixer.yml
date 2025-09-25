@@ -121,18 +121,16 @@ jobs:
       - name: 💾 Commit Fixes
         if: success()
         run: |
-          git config --local user.email "claude-bot@anthropic.com"
-          git config --local user.name "Claude CI/CD Bot"
+          git config --local user.email "chude@emeke.org"
+          git config --local user.name "Chude"
 
           if [ -n "$(git status --porcelain)" ]; then
             git add -A
-            git commit -m "🤖 Auto-fix: Resolve CI/CD issues
+            git commit -m "Auto-fix: Resolve CI/CD issues
 
-            - Fixed by Claude Universal Fixer
+            - Fixed by Universal Fixer
             - Project type: ${{ steps.detect.outputs.PROJECT_TYPE }}
-            - Workflow run: #${{ github.run_number }}
-
-            Co-authored-by: Claude <claude-bot@anthropic.com>"
+            - Workflow run: #${{ github.run_number }}"
 
             git push
             echo "✅ Fixes committed and pushed!"
@@ -144,7 +142,7 @@ jobs:
         if: always()
         run: |
           echo "======================================"
-          echo "🤖 Claude Universal Fixer Report"
+          echo "Universal Fixer Report"
           echo "======================================"
           echo "Repository: ${{ github.repository }}"
           echo "Project Type: ${{ steps.detect.outputs.PROJECT_TYPE }}"

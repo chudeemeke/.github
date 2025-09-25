@@ -106,18 +106,16 @@ EOF
             fi
 
             # Commit and push
-            git config user.email "claude-bot@anthropic.com"
-            git config user.name "Claude CI/CD Bot"
+            git config user.email "chude@emeke.org"
+            git config user.name "Chude"
             git add -A
 
             if [ -n "$(git status --porcelain)" ]; then
-              git commit -m "🤖 Auto-setup: Add Universal Claude CI/CD Fixer
+              git commit -m "Auto-setup: Add Universal CI/CD Fixer
 
               - Automatically added by New Repository Monitor
               - Enables self-healing CI/CD pipelines
-              - Zero configuration required
-
-              Co-authored-by: Claude Monitor <claude-bot@anthropic.com>"
+              - Zero configuration required"
 
               git push origin main || git push origin master || echo "Push failed for $repo"
 
@@ -137,7 +135,7 @@ EOF
         if: always()
         run: |
           echo "======================================"
-          echo "🤖 New Repository Monitor Report"
+          echo "New Repository Monitor Report"
           echo "======================================"
           echo "Timestamp: $(date)"
           echo "Repositories Checked: $(echo '${{ steps.detect_new_repos.outputs.REPOS_TO_UPDATE }}' | wc -w)"
@@ -156,7 +154,7 @@ EOF
             await github.rest.issues.create({
               owner: 'chudeemeke',
               repo: '.github',
-              title: `🤖 Claude Fixer added to ${count} new repositories`,
-              body: `The Universal Claude CI/CD Fixer has been automatically added to the following repositories:\n\n${repos.map(r => `- [${r}](https://github.com/chudeemeke/${r})`).join('\n')}\n\n✅ All repositories now have self-healing CI/CD pipelines!`,
-              labels: ['automation', 'claude-fixer']
+              title: `Universal Fixer added to ${count} new repositories`,
+              body: `The Universal CI/CD Fixer has been automatically added to the following repositories:\n\n${repos.map(r => `- [${r}](https://github.com/chudeemeke/${r})`).join('\n')}\n\n✅ All repositories now have self-healing CI/CD pipelines!`,
+              labels: ['automation', 'universal-fixer']
             });
