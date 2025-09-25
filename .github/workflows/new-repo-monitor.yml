@@ -25,7 +25,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "🔍 Scanning for repositories without Claude Fixer..."
+          echo "🔍 Scanning for repositories without Universal Fixer..."
 
           # Get all repos
           all_repos=$(gh repo list chudeemeke --limit 100 --json name,createdAt,pushedAt --jq '.[] | .name')
@@ -41,11 +41,11 @@ jobs:
             has_claude=$(gh api "repos/chudeemeke/$repo/contents/.github/workflows" 2>/dev/null | jq -r '.[] | .name' | grep -i claude || echo "")
 
             if [ -z "$has_claude" ] || [ "${{ github.event.inputs.force_update }}" == "true" ]; then
-              echo "  ⚠️ $repo needs Claude Fixer"
+              echo "  ⚠️ $repo needs Universal Fixer"
               repos_to_update="$repos_to_update $repo"
               ((new_count++))
             else
-              echo "  ✅ $repo already has Claude Fixer"
+              echo "  ✅ $repo already has Universal Fixer"
             fi
           done
 
@@ -56,7 +56,7 @@ jobs:
           echo "📊 Found $new_count repositories needing updates"
           echo "======================================"
 
-      - name: 🚀 Auto-Setup Claude Fixer
+      - name: 🚀 Auto-Setup Universal Fixer
         if: steps.detect_new_repos.outputs.NEW_COUNT > 0
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -85,7 +85,7 @@ jobs:
               cat > CLAUDE.md << 'EOF'
 # CLAUDE.md
 
-This project has the Universal Claude CI/CD Fixer enabled.
+This project has the Universal Universal CI/CD Fixer enabled.
 
 ## Features
 - Automatic detection of project type and language
@@ -98,7 +98,7 @@ This project has the Universal Claude CI/CD Fixer enabled.
 3. Fixes are committed back to the repository
 
 ## Manual Trigger
-Go to Actions → Universal Claude CI/CD Fixer → Run workflow
+Go to Actions → Universal Universal CI/CD Fixer → Run workflow
 
 ## Configuration
 The fixer works out-of-the-box with zero configuration required.

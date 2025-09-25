@@ -12,7 +12,7 @@ This is the master template repository that automatically provides the Universal
 
 2. **Hourly Monitor** (Layer 2)
    - Scans for new repos every hour
-   - Automatically adds Claude Fixer to any missed repos
+   - Automatically adds Universal Fixer to any missed repos
 
 3. **Instant Setup** (Layer 3)
    - Real-time webhook detection

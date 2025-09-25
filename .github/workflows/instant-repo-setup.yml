@@ -18,7 +18,7 @@ jobs:
       - name: 📥 Checkout Template
         uses: actions/checkout@v4
 
-      - name: ⚡ Instant Setup Claude Fixer
+      - name: ⚡ Instant Setup Universal Fixer
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           ANTHROPIC_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
@@ -40,7 +40,7 @@ jobs:
           # Add CLAUDE.md
           cp $GITHUB_WORKSPACE/CLAUDE.md . 2>/dev/null || cat > CLAUDE.md << 'EOF'
 # CLAUDE.md
-This project has Universal Claude CI/CD Fixer enabled for self-healing builds.
+This project has Universal Universal CI/CD Fixer enabled for self-healing builds.
 EOF
 
           # Commit
