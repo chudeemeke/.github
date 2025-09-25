@@ -1,0 +1,153 @@
+name: 🤖 Universal Claude CI/CD Fixer
+
+on:
+  push:
+    branches: [main, master, develop]
+  pull_request:
+    types: [opened, synchronize]
+  workflow_dispatch:
+    inputs:
+      fix_type:
+        description: 'Type of fix to perform'
+        required: false
+        default: 'auto-detect'
+        type: choice
+        options:
+          - auto-detect
+          - build-errors
+          - test-failures
+          - lint-issues
+          - dependency-conflicts
+          - type-errors
+          - deployment-issues
+
+jobs:
+  intelligent-auto-fix:
+    runs-on: ubuntu-latest
+    if: ${{ always() }}
+
+    steps:
+      - name: 📥 Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: 🧠 Intelligent Project Detection
+        id: detect
+        run: |
+          echo "🔍 Detecting project type and configuration..."
+
+          # Detect language
+          if [ -f "package.json" ]; then
+            echo "PROJECT_TYPE=node" >> $GITHUB_OUTPUT
+            if [ -f "pnpm-lock.yaml" ]; then
+              echo "PACKAGE_MANAGER=pnpm" >> $GITHUB_OUTPUT
+            elif [ -f "yarn.lock" ]; then
+              echo "PACKAGE_MANAGER=yarn" >> $GITHUB_OUTPUT
+            else
+              echo "PACKAGE_MANAGER=npm" >> $GITHUB_OUTPUT
+            fi
+          elif [ -f "requirements.txt" ] || [ -f "setup.py" ] || [ -f "Pipfile" ]; then
+            echo "PROJECT_TYPE=python" >> $GITHUB_OUTPUT
+          elif [ -f "pom.xml" ]; then
+            echo "PROJECT_TYPE=java-maven" >> $GITHUB_OUTPUT
+          elif [ -f "build.gradle" ]; then
+            echo "PROJECT_TYPE=java-gradle" >> $GITHUB_OUTPUT
+          elif [ -f "go.mod" ]; then
+            echo "PROJECT_TYPE=go" >> $GITHUB_OUTPUT
+          elif [ -f "Cargo.toml" ]; then
+            echo "PROJECT_TYPE=rust" >> $GITHUB_OUTPUT
+          elif [ -f "Gemfile" ]; then
+            echo "PROJECT_TYPE=ruby" >> $GITHUB_OUTPUT
+          elif [ -f "composer.json" ]; then
+            echo "PROJECT_TYPE=php" >> $GITHUB_OUTPUT
+          elif [ -f "*.csproj" ] || [ -f "*.sln" ]; then
+            echo "PROJECT_TYPE=dotnet" >> $GITHUB_OUTPUT
+          else
+            echo "PROJECT_TYPE=unknown" >> $GITHUB_OUTPUT
+          fi
+
+          echo "✅ Detection complete!"
+
+      - name: 🔧 Universal Claude AI Fixer
+        uses: anthropics/claude-code-action@v1
+        with:
+          api-key: ${{ secrets.ANTHROPIC_API_KEY }}
+          model: claude-3-5-sonnet-20241022
+          max-tokens: 8192
+          system-prompt: |
+            You are an expert CI/CD engineer fixing build issues.
+            Project type: ${{ steps.detect.outputs.PROJECT_TYPE }}
+            Package manager: ${{ steps.detect.outputs.PACKAGE_MANAGER }}
+
+            INTELLIGENT FIX INSTRUCTIONS:
+            1. Analyze all error logs and build output
+            2. Identify the root cause of failures
+            3. Apply comprehensive fixes that address:
+               - Build errors
+               - TypeScript/Type errors
+               - Linting issues
+               - Test failures
+               - Dependency conflicts
+               - Configuration problems
+               - Platform-specific issues
+            4. Ensure the fix is complete and the build will succeed
+            5. Preserve existing code style and conventions
+            6. Add any missing dependencies or configurations
+            7. Update outdated syntax or deprecated features
+
+            BE THOROUGH: Fix ALL issues, not just the first one you find.
+
+          prompt: |
+            Fix all CI/CD issues in this repository.
+
+            Error context:
+            ${{ github.event.head_commit.message }}
+
+            Previous build status: ${{ job.status }}
+
+            Workflow run: ${{ github.run_number }}
+
+            Fix type requested: ${{ github.event.inputs.fix_type || 'auto-detect' }}
+
+            Instructions:
+            1. Detect and analyze ALL errors
+            2. Apply comprehensive fixes
+            3. Ensure build success
+            4. Handle edge cases
+            5. Fix root causes, not symptoms
+
+      - name: 💾 Commit Fixes
+        if: success()
+        run: |
+          git config --local user.email "claude-bot@anthropic.com"
+          git config --local user.name "Claude CI/CD Bot"
+
+          if [ -n "$(git status --porcelain)" ]; then
+            git add -A
+            git commit -m "🤖 Auto-fix: Resolve CI/CD issues
+
+            - Fixed by Claude Universal Fixer
+            - Project type: ${{ steps.detect.outputs.PROJECT_TYPE }}
+            - Workflow run: #${{ github.run_number }}
+
+            Co-authored-by: Claude <claude-bot@anthropic.com>"
+
+            git push
+            echo "✅ Fixes committed and pushed!"
+          else
+            echo "ℹ️ No fixes needed - repository is already healthy!"
+          fi
+
+      - name: 📊 Report Status
+        if: always()
+        run: |
+          echo "======================================"
+          echo "🤖 Claude Universal Fixer Report"
+          echo "======================================"
+          echo "Repository: ${{ github.repository }}"
+          echo "Project Type: ${{ steps.detect.outputs.PROJECT_TYPE }}"
+          echo "Package Manager: ${{ steps.detect.outputs.PACKAGE_MANAGER || 'N/A' }}"
+          echo "Fix Status: ${{ job.status }}"
+          echo "======================================"

@@ -1,0 +1,61 @@
+name: ⚡ Instant New Repo Setup
+
+on:
+  repository_dispatch:
+    types: [new-repo-created]
+  workflow_dispatch:
+    inputs:
+      repository_name:
+        description: 'Repository name to setup'
+        required: true
+        type: string
+
+jobs:
+  instant-setup:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📥 Checkout Template
+        uses: actions/checkout@v4
+
+      - name: ⚡ Instant Setup Claude Fixer
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ANTHROPIC_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          REPO_NAME: ${{ github.event.client_payload.repository || github.event.inputs.repository_name }}
+        run: |
+          echo "⚡ Instant setup for: $REPO_NAME"
+
+          # Wait a moment for repo to be fully created
+          sleep 5
+
+          # Clone new repository
+          git clone "https://github.com/chudeemeke/$REPO_NAME.git" "/tmp/$REPO_NAME"
+          cd "/tmp/$REPO_NAME"
+
+          # Setup workflows
+          mkdir -p .github/workflows
+          cp $GITHUB_WORKSPACE/.github/workflows/claude-universal-fixer.yml .github/workflows/
+
+          # Add CLAUDE.md
+          cp $GITHUB_WORKSPACE/CLAUDE.md . 2>/dev/null || cat > CLAUDE.md << 'EOF'
+# CLAUDE.md
+This project has Universal Claude CI/CD Fixer enabled for self-healing builds.
+EOF
+
+          # Commit
+          git config user.email "claude-bot@anthropic.com"
+          git config user.name "Claude Instant Bot"
+          git add -A
+          git commit -m "⚡ Instant setup: Universal Claude CI/CD Fixer
+
+          - Added immediately upon repository creation
+          - Self-healing CI/CD enabled
+          - Zero configuration required"
+
+          git push
+
+          # Set secret
+          gh secret set ANTHROPIC_API_KEY -b "$ANTHROPIC_KEY" --repo "chudeemeke/$REPO_NAME"
+
+          echo "✅ Instant setup complete for $REPO_NAME!"

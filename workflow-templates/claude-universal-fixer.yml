@@ -1,0 +1,10 @@
+name: 🤖 Universal Claude CI/CD Fixer
+description: Automatically fixes all CI/CD issues using Claude AI
+iconName: robot
+categories:
+  - continuous-integration
+  - utilities
+  - automation
+filePatterns:
+  - ".*"
+  - "**/*"

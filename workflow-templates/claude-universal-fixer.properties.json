@@ -1,0 +1,7 @@
+{
+  "name": "Universal Claude CI/CD Fixer",
+  "description": "Automatically detects and fixes all build, test, and deployment issues using Claude AI",
+  "iconName": "robot",
+  "categories": ["continuous-integration", "utilities", "automation"],
+  "filePatterns": [".*", "**/*"]
+}
